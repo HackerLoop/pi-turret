@@ -18,7 +18,7 @@ SERVO_CENTER		= 400		# Center value for the servo, should be 0 degrees of rotati
 
 
 
-s = servos.Servos(SERVO_I2C_ADDRESS, SERVO_XAXIS_CHANNEL, SERVO_YAXIS_CHANNEL, SERVO_PWM_FREQ)
+s = Servos(SERVO_I2C_ADDRESS, SERVO_XAXIS_CHANNEL, SERVO_YAXIS_CHANNEL, SERVO_PWM_FREQ)
 
 def on_message(ws, message):
     data = json.loads(message)
