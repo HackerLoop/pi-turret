@@ -1,4 +1,4 @@
-#!/usr/bin/python2.7
+#!/bin/env python
 
 import RPi.GPIO as GPIO
 
