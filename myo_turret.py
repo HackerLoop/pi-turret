@@ -15,13 +15,13 @@ from servos import Servos
 
 ### Confs
 
-SERVO_I2C_ADDRESS	= 0x40		# I2C address of the PCA9685-based servo controller
-SERVO_XAXIS_CHANNEL = 0			# Channel for the x axis rotation which controls laser up/down
-SERVO_YAXIS_CHANNEL = 1			# Channel for the y axis rotation which controls laser left/right
-SERVO_PWM_FREQ		= 50		# PWM frequency for the servos in HZ (should be 50)
-SERVO_MIN			= 200		# Minimum rotation value for the servo, should be -90 degrees of rotation.
-SERVO_MAX			= 600		# Maximum rotation value for the servo, should be 90 degrees of rotation.
-SERVO_CENTER		= 330		# Center value for the servo, should be 0 degrees of rotation.
+SERVO_I2C_ADDRESS       = 0x40          # I2C address of the PCA9685-based servo controller
+SERVO_XAXIS_CHANNEL = 0                 # Channel for the x axis rotation which controls laser up/down
+SERVO_YAXIS_CHANNEL = 1                 # Channel for the y axis rotation which controls laser left/right
+SERVO_PWM_FREQ          = 50            # PWM frequency for the servos in HZ (should be 50)
+SERVO_MIN                       = 200           # Minimum rotation value for the servo, should be -90 degrees of rotation.
+SERVO_MAX                       = 600           # Maximum rotation value for the servo, should be 90 degrees of rotation.
+SERVO_CENTER            = 330           # Center value for the servo, should be 0 degrees of rotation.
 
 NERF_TRIGGER = 18
 
@@ -58,15 +58,15 @@ orientation = {'x' : 0, 'y' : 0}
 def on_orientation(data):
     global orientation
     if synced == False:
-	return
+        return
 
     def _filter_decimal(value):
-	return float(int(value * 1000)) / 1000
+        return float(int(value * 1000)) / 1000
 
     orientation_x = _filter_decimal(data[1]['gyroscope'][2] / 8000)
     orientation_y = _filter_decimal(data[1]['gyroscope'][1] / 5000)
     if math.fabs(orientation_x) >= 1 or math.fabs(orientation_y) >= 1:
-	return
+        return
 
     x = min(max(orientation['x'] + orientation_x, -1), 1)
     y = min(max(orientation['y'] + orientation_y, -1), 1)
@@ -86,18 +86,18 @@ def on_pose(data):
     if shooting is False and data[1]['pose'] == 'fist':
         GPIO.output(NERF_TRIGGER, True)
 
-	def reset_shooting():
-	    global shooting
-	    print('reset_shooting')
-	    GPIO.output(NERF_TRIGGER, False)
-	    shooting = False
+        def reset_shooting():
+            global shooting
+            print('reset_shooting')
+            GPIO.output(NERF_TRIGGER, False)
+            shooting = False
 
-	t = Timer(0.400, reset_shooting)
-	t.start()
-	shooting = True
+        t = Timer(0.400, reset_shooting)
+        t.start()
+        shooting = True
     if data[1]['pose'] in ('wave_in', 'wave_out'):
-	print('reset zero position ####################################################################')
-	orientation = {'x' : 0, 'y' : 0}
+        print('reset zero position ####################################################################')
+        orientation = {'x' : 0, 'y' : 0}
     print(data)
 
 def on_locked(data):
@@ -122,8 +122,8 @@ def on_message(ws, message):
 
     event = data[1]['type']
     if not event in myo_cmds:
-	print('{0} not found'.format(event))
-	return
+        print('{0} not found'.format(event))
+        return
 
     myo_cmd = myo_cmds[event]
     myo_cmd(data)
