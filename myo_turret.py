@@ -1,7 +1,5 @@
 #!/bin/env python
 
-import RPi.GPIO as GPIO
-
 import websocket
 import thread
 from threading import Timer
@@ -12,6 +10,7 @@ import math
 import json
 
 from servos import Servos
+from trigger import Trigger
 
 ### Confs
 
@@ -19,33 +18,32 @@ SERVO_I2C_ADDRESS       = 0x40          # I2C address of the PCA9685-based servo
 SERVO_XAXIS_CHANNEL = 0                 # Channel for the x axis rotation which controls laser up/down
 SERVO_YAXIS_CHANNEL = 1                 # Channel for the y axis rotation which controls laser left/right
 SERVO_PWM_FREQ          = 50            # PWM frequency for the servos in HZ (should be 50)
-SERVO_MIN                       = 200           # Minimum rotation value for the servo, should be -90 degrees of rotation.
-SERVO_MAX                       = 600           # Maximum rotation value for the servo, should be 90 degrees of rotation.
-SERVO_CENTER            = 330           # Center value for the servo, should be 0 degrees of rotation.
-
-NERF_TRIGGER = 18
+SERVO_MIN                       = 170           # Minimum rotation value for the servo, should be -90 degrees of rotation.
+SERVO_MAX                       = 480           # Maximum rotation value for the servo, should be 90 degrees of rotation.
+SERVO_CENTER            = 340           # Center value for the servo, should be 0 degrees of rotation.
 
 synced = False
 
 ### utils
 
 def _reset_servos():
-    pass
     s.setXAxis(SERVO_CENTER)
     s.setYAxis(SERVO_CENTER)
 
 ### code
 
-# gpio setup
-
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(NERF_TRIGGER, GPIO.OUT)
-GPIO.output(NERF_TRIGGER, False)
-
+trigger = Trigger()
 
 # servo driver conf
 s = Servos(SERVO_I2C_ADDRESS, SERVO_XAXIS_CHANNEL, SERVO_YAXIS_CHANNEL, SERVO_PWM_FREQ)
 _reset_servos()
+
+def signal_handler(signal, frame):
+    _reset_servos()
+    trigger.reset()
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
 
 # pi camera setup
 # camera = picamera.PiCamera()
@@ -79,22 +77,10 @@ def on_orientation(data):
     s.setXAxis(int(SERVO_CENTER + x * span / 2))
     s.setYAxis(int(SERVO_CENTER + y * span / 2))
 
-shooting = False
-
 def on_pose(data): 
-    global orientation, shooting
-    if shooting is False and data[1]['pose'] == 'fist':
-        GPIO.output(NERF_TRIGGER, True)
-
-        def reset_shooting():
-            global shooting
-            print('reset_shooting')
-            GPIO.output(NERF_TRIGGER, False)
-            shooting = False
-
-        t = Timer(0.400, reset_shooting)
-        t.start()
-        shooting = True
+    global orientation
+    if data[1]['pose'] == 'fist':
+        trigger.shoot(1)
     if data[1]['pose'] in ('wave_in', 'wave_out'):
         print('reset zero position ####################################################################')
         orientation = {'x' : 0, 'y' : 0}
@@ -109,10 +95,12 @@ def on_arm_unsynced(data):
     synced = False
     orientation = {'x' : 0, 'y' : 0}
     _reset_servos()
+    trigger.reset()
 
 def on_arm_synced(data):
     print('synced')
     global synced
+    trigger.pre_shoot()
     synced = True
 
 def on_message(ws, message):
