@@ -1,5 +1,4 @@
 RPi.GPIO==0.5.11
-RPIO==0.10.0
 six==1.9.0
 smbus==1.1
 websocket-client==0.26.0
