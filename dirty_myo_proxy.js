@@ -1,3 +1,5 @@
+#!/usr/local/bin/node
+
 var httpProxy = require('http-proxy');
 
 var proxy = httpProxy.createProxyServer({
