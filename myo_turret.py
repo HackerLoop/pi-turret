@@ -1,5 +1,6 @@
 #!/bin/env python
 
+import signal
 import websocket
 import thread
 from threading import Timer
