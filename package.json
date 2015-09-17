@@ -1,0 +1,24 @@
+{
+  "name": "pi-turret",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dirty_myo_proxy.js",
+  "dependencies": {
+    "http-proxy": "git://github.com/nodejitsu/node-http-proxy.git",
+    "node-http-proxy": "^0.2.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HackerLoop/pi-turret.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/HackerLoop/pi-turret/issues"
+  },
+  "homepage": "https://github.com/HackerLoop/pi-turret"
+}
